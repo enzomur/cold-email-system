@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Leads — Cold Email{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold">Leads <span class="text-gray-400 text-lg font-normal">({{ total }})</span></h2>
+    <div class="flex gap-2">
+        <button onclick="generateEmails()" class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+            Generate Emails
+        </button>
+        <button onclick="deleteSelected()" class="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 text-sm font-medium">
+            Delete Selected
+        </button>
+    </div>
+</div>
+
+<!-- Filters -->
+<form method="GET" class="flex flex-wrap gap-3 mb-4">
+    <input type="text" name="search" value="{{ filters.get('search', '') }}" placeholder="Search..."
+           class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+    <select name="tier" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+        <option value="">All Tiers</option>
+        <option value="hot" {{ 'selected' if filters.get('tier') == 'hot' }}>Hot</option>
+        <option value="warm" {{ 'selected' if filters.get('tier') == 'warm' }}>Warm</option>
+        <option value="cool" {{ 'selected' if filters.get('tier') == 'cool' }}>Cool</option>
+        <option value="skip" {{ 'selected' if filters.get('tier') == 'skip' }}>Skip</option>
+    </select>
+    <select name="status" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+        <option value="">All Status</option>
+        {% for s in ['new', 'contacted', 'replied', 'converted', 'not_interested'] %}
+        <option value="{{ s }}" {{ 'selected' if filters.get('status') == s }}>{{ s|replace('_', ' ')|title }}</option>
+        {% endfor %}
+    </select>
+    <select name="trade" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+        <option value="">All Trades</option>
+        {% for t in ['electrician', 'plumber', 'hvac', 'roofer', 'general contractor', 'handyman'] %}
+        <option value="{{ t }}" {{ 'selected' if filters.get('trade') == t }}>{{ t|title }}</option>
+        {% endfor %}
+    </select>
+    <label class="flex items-center gap-1 text-sm">
+        <input type="checkbox" name="has_email" value="1" {{ 'checked' if filters.get('has_email') }} class="rounded border-gray-300 text-brand">
+        Has Email
+    </label>
+    <button type="submit" class="px-4 py-1.5 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm">Filter</button>
+    <a href="/leads" class="px-4 py-1.5 text-gray-500 hover:text-gray-700 text-sm">Clear</a>
+</form>
+
+<!-- Table -->
+<div class="overflow-x-auto border border-gray-200 rounded-lg">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="p-3 text-left"><input type="checkbox" id="select-all" class="rounded border-gray-300"></th>
+                <th class="p-3 text-left">Tier</th>
+                <th class="p-3 text-left">Score</th>
+                <th class="p-3 text-left">Business</th>
+                <th class="p-3 text-left">Email</th>
+                <th class="p-3 text-left">Phone</th>
+                <th class="p-3 text-left">Location</th>
+                <th class="p-3 text-left">Trade</th>
+                <th class="p-3 text-left">Reviews</th>
+                <th class="p-3 text-left">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lead in leads %}
+            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                <td class="p-3"><input type="checkbox" class="lead-cb rounded border-gray-300" value="{{ lead.id }}"></td>
+                <td class="p-3">
+                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold
+                        {% if lead.lead_tier == 'hot' %}bg-green-100 text-green-800
+                        {% elif lead.lead_tier == 'warm' %}bg-yellow-100 text-yellow-800
+                        {% elif lead.lead_tier == 'cool' %}bg-gray-100 text-gray-600
+                        {% else %}bg-red-50 text-red-500{% endif %}">
+                        {{ lead.lead_tier|upper }}
+                    </span>
+                </td>
+                <td class="p-3 font-mono text-gray-700">{{ lead.lead_score }}</td>
+                <td class="p-3">
+                    <span class="font-medium">{{ lead.business_name }}</span>
+                    {% if lead.contact_name %}
+                    <span class="block text-xs text-gray-500">{{ lead.contact_name }}</span>
+                    {% endif %}
+                </td>
+                <td class="p-3">
+                    {% if lead.email %}
+                    <span class="text-brand">{{ lead.email }}</span>
+                    {% else %}
+                    <span class="text-gray-400">—</span>
+                    {% endif %}
+                </td>
+                <td class="p-3 text-gray-600">{{ lead.phone or '—' }}</td>
+                <td class="p-3 text-gray-600">{{ lead.city }}{% if lead.state %}, {{ lead.state }}{% endif %}</td>
+                <td class="p-3">{{ lead.trade }}</td>
+                <td class="p-3 text-gray-600">{{ lead.review_count or '—' }}</td>
+                <td class="p-3">
+                    <span class="px-2 py-0.5 rounded-full text-xs font-medium
+                        {% if lead.status == 'new' %}bg-blue-50 text-blue-700
+                        {% elif lead.status == 'contacted' %}bg-yellow-50 text-yellow-700
+                        {% elif lead.status == 'replied' %}bg-green-50 text-green-700
+                        {% elif lead.status == 'converted' %}bg-green-100 text-green-800
+                        {% else %}bg-gray-100 text-gray-600{% endif %}">
+                        {{ lead.status }}
+                    </span>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="10" class="p-8 text-center text-gray-400">No leads found. <a href="/scrape" class="text-brand hover:underline">Start scraping</a></td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+{% if pages > 1 %}
+<div class="flex justify-center gap-1 mt-4">
+    {% for p in range(1, pages + 1) %}
+    <a href="?page={{ p }}&{{ filters|urlencode }}"
+       class="px-3 py-1 rounded text-sm {{ 'bg-brand text-white' if p == page else 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+        {{ p }}
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('select-all').addEventListener('change', (e) => {
+    document.querySelectorAll('.lead-cb').forEach(cb => cb.checked = e.target.checked);
+});
+
+function getSelectedIds() {
+    return Array.from(document.querySelectorAll('.lead-cb:checked')).map(cb => parseInt(cb.value));
+}
+
+async function generateEmails() {
+    const ids = getSelectedIds();
+    if (!ids.length) { showToast('Select leads first', 'error'); return; }
+
+    const template = prompt('Template name (intro, referral, value_first):', 'intro');
+    if (!template) return;
+
+    const res = await fetch('/api/emails/generate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ lead_ids: ids, template: template })
+    });
+    const data = await res.json();
+    if (data.error) { showToast(data.error, 'error'); }
+    else { showToast(`Created ${data.emails_created} emails`, 'success'); }
+}
+
+async function deleteSelected() {
+    const ids = getSelectedIds();
+    if (!ids.length) { showToast('Select leads first', 'error'); return; }
+    if (!confirm(`Delete ${ids.length} leads?`)) return;
+
+    const res = await fetch('/api/leads/delete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ ids: ids })
+    });
+    const data = await res.json();
+    if (data.success) { showToast(`Deleted ${data.deleted} leads`, 'success'); setTimeout(() => location.reload(), 800); }
+}
+</script>
+{% endblock %}

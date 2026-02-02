@@ -1,0 +1,35 @@
+/* Minimal custom styles — Tailwind CDN handles most styling */
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    transition: all 0.15s;
+}
+
+.nav-link:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+.nav-link.active {
+    background-color: #eff6ff;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+/* Scrollbar */
+main::-webkit-scrollbar {
+    width: 6px;
+}
+main::-webkit-scrollbar-track {
+    background: transparent;
+}
+main::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}

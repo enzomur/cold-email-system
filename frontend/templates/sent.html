@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Sent Emails — Cold Email{% endblock %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">Sent Emails <span class="text-gray-400 text-lg font-normal">({{ emails|length }})</span></h2>
+
+<div class="overflow-x-auto border border-gray-200 rounded-lg">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="p-3 text-left">Business</th>
+                <th class="p-3 text-left">To</th>
+                <th class="p-3 text-left">Subject</th>
+                <th class="p-3 text-left">Seq</th>
+                <th class="p-3 text-left">Sent</th>
+                <th class="p-3 text-left">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for email in emails %}
+            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                <td class="p-3 font-medium">{{ email.business_name }}</td>
+                <td class="p-3 text-gray-600">{{ email.lead_email }}</td>
+                <td class="p-3">{{ email.subject }}</td>
+                <td class="p-3 text-center">{{ email.sequence_num }}</td>
+                <td class="p-3 text-gray-500 text-xs">{{ email.sent_date[:16] if email.sent_date else '—' }}</td>
+                <td class="p-3">
+                    <span class="px-2 py-0.5 rounded-full text-xs font-medium
+                        {% if email.status == 'opened' %}bg-yellow-50 text-yellow-700
+                        {% elif email.status == 'replied' %}bg-green-50 text-green-700
+                        {% else %}bg-gray-100 text-gray-600{% endif %}">
+                        {{ email.status }}
+                    </span>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="p-8 text-center text-gray-400">No emails sent yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
