@@ -332,13 +332,42 @@ def log_send(email_id: int, gmail_message_id: str = ''):
     conn.close()
 
 
-def get_emails_for_lead(lead_id: int) -> list[dict]:
+def get_emails_for_lead(lead_id: int, exclude_rejected: bool = False) -> list[dict]:
     conn = get_db()
-    rows = conn.execute(
-        "SELECT * FROM emails WHERE lead_id = ? ORDER BY sequence_num", (lead_id,)
-    ).fetchall()
+    if exclude_rejected:
+        rows = conn.execute(
+            "SELECT * FROM emails WHERE lead_id = ? AND status != 'rejected' ORDER BY sequence_num",
+            (lead_id,)
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM emails WHERE lead_id = ? ORDER BY sequence_num", (lead_id,)
+        ).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+def delete_emails_for_leads(lead_ids: list[int]) -> int:
+    """Delete all emails for given lead IDs. Returns count deleted."""
+    if not lead_ids:
+        return 0
+    conn = get_db()
+    placeholders = ','.join('?' * len(lead_ids))
+    cursor = conn.execute(f"DELETE FROM emails WHERE lead_id IN ({placeholders})", lead_ids)
+    count = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return count
+
+
+def clear_all_emails() -> int:
+    """Delete all emails from the queue. Returns count deleted."""
+    conn = get_db()
+    cursor = conn.execute("DELETE FROM emails")
+    count = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return count
 
 
 def get_followup_candidates() -> list[dict]:

@@ -83,9 +83,9 @@
                 </td>
                 <td class="p-3">
                     {% if lead.email %}
-                    <span class="text-brand">{{ lead.email }}</span>
+                    <span class="text-brand cursor-pointer hover:underline" onclick="editLead({{ lead.id }}, event)">{{ lead.email }}</span>
                     {% else %}
-                    <span class="text-gray-400">—</span>
+                    <span class="text-red-400 cursor-pointer hover:underline" onclick="editLead({{ lead.id }}, event)">+ Add Email</span>
                     {% endif %}
                 </td>
                 <td class="p-3 text-gray-600">{{ lead.phone or '—' }}</td>
@@ -108,6 +108,43 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
+
+<!-- Edit Lead Modal -->
+<div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 m-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">Edit Lead</h3>
+            <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+        </div>
+        <form id="edit-form" class="space-y-4">
+            <input type="hidden" id="edit-lead-id">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                <input type="text" id="edit-business-name" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" readonly>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Contact Name</label>
+                <input type="text" id="edit-contact-name" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                <input type="email" id="edit-email" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" placeholder="Enter email address">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <input type="text" id="edit-phone" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <textarea id="edit-notes" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand"></textarea>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 font-medium">Save</button>
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium">Cancel</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Pagination -->
@@ -137,8 +174,21 @@ async function generateEmails() {
     const ids = getSelectedIds();
     if (!ids.length) { showToast('Select leads first', 'error'); return; }
 
-    const template = prompt('Template name (intro, referral, value_first):', 'intro');
-    if (!template) return;
+    // Show template selection
+    const templates = [
+        { value: 'pain_point', label: 'Pain Point - Forgotten invoices angle' },
+        { value: 'cost_savings', label: 'Cost Savings - vs Jobber/ServiceTitan' },
+        { value: 'direct', label: 'Direct - Straightforward product pitch' },
+        { value: 'admin_chaos', label: 'Admin Chaos - Sticky notes & scattered texts' },
+        { value: 'time_savings', label: 'Time Savings - Hours wasted on paperwork' },
+        { value: 'social_proof', label: 'Social Proof - What other pros are saying' },
+    ];
+    const templateList = templates.map((t, i) => `${i + 1}. ${t.label}`).join('\n');
+    const choice = prompt(`Select email template (1-6):\n\n${templateList}`, '1');
+    if (!choice) return;
+
+    const idx = parseInt(choice) - 1;
+    const template = templates[idx]?.value || 'pain_point';
 
     const res = await fetch('/api/emails/generate', {
         method: 'POST',
@@ -147,6 +197,7 @@ async function generateEmails() {
     });
     const data = await res.json();
     if (data.error) { showToast(data.error, 'error'); }
+    else if (data.emails_created === 0) { showToast('No emails created - leads may be missing email addresses', 'error'); }
     else { showToast(`Created ${data.emails_created} emails`, 'success'); }
 }
 
@@ -163,5 +214,59 @@ async function deleteSelected() {
     const data = await res.json();
     if (data.success) { showToast(`Deleted ${data.deleted} leads`, 'success'); setTimeout(() => location.reload(), 800); }
 }
+
+// Edit Lead Modal
+async function editLead(leadId, event) {
+    event.stopPropagation();
+    const res = await fetch(`/api/leads/${leadId}`);
+    const lead = await res.json();
+    if (lead.error) { showToast(lead.error, 'error'); return; }
+
+    document.getElementById('edit-lead-id').value = lead.id;
+    document.getElementById('edit-business-name').value = lead.business_name || '';
+    document.getElementById('edit-contact-name').value = lead.contact_name || '';
+    document.getElementById('edit-email').value = lead.email || '';
+    document.getElementById('edit-phone').value = lead.phone || '';
+    document.getElementById('edit-notes').value = lead.notes || '';
+
+    document.getElementById('edit-modal').classList.remove('hidden');
+    document.getElementById('edit-modal').classList.add('flex');
+    document.getElementById('edit-email').focus();
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').classList.add('hidden');
+    document.getElementById('edit-modal').classList.remove('flex');
+}
+
+document.getElementById('edit-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const leadId = document.getElementById('edit-lead-id').value;
+    const data = {
+        contact_name: document.getElementById('edit-contact-name').value,
+        email: document.getElementById('edit-email').value,
+        phone: document.getElementById('edit-phone').value,
+        notes: document.getElementById('edit-notes').value,
+    };
+
+    const res = await fetch(`/api/leads/${leadId}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.success) {
+        showToast('Lead updated', 'success');
+        closeEditModal();
+        setTimeout(() => location.reload(), 500);
+    } else {
+        showToast(result.error || 'Update failed', 'error');
+    }
+});
+
+// Close modal on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeEditModal();
+});
 </script>
 {% endblock %}

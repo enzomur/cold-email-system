@@ -354,10 +354,17 @@ def api_get_templates():
 
 @app.route('/api/emails/preview', methods=['GET'])
 def api_preview_template():
-    name = request.args.get('template', 'intro')
+    name = request.args.get('template', 'pain_point')
     seq = request.args.get('sequence', 1, type=int)
     preview = preview_template(name, seq)
     return jsonify(preview)
+
+
+@app.route('/api/emails/clear-all', methods=['POST'])
+def api_clear_all_emails():
+    from backend.database import clear_all_emails
+    count = clear_all_emails()
+    return jsonify({'success': True, 'deleted': count})
 
 
 # --- API: Sheets ---

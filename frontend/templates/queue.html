@@ -24,6 +24,9 @@
             Send All
         </button>
         {% endif %}
+        <button onclick="clearAll()" class="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 text-sm font-medium">
+            Clear All
+        </button>
     </div>
 </div>
 
@@ -135,6 +138,14 @@ async function sendAll() {
     const data = await res.json();
     if (data.error) { showToast(data.error, 'error'); }
     else { showToast(`Sent: ${data.sent}, Failed: ${data.failed}`, data.failed ? 'error' : 'success'); setTimeout(() => location.reload(), 1500); }
+}
+
+async function clearAll() {
+    if (!confirm('Delete ALL emails from the queue? This cannot be undone.')) return;
+    const res = await fetch('/api/emails/clear-all', { method: 'POST' });
+    const data = await res.json();
+    showToast(`Deleted ${data.deleted} emails`, 'success');
+    setTimeout(() => location.reload(), 800);
 }
 </script>
 {% endblock %}

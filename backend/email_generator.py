@@ -11,121 +11,279 @@ DEFAULT_DELAY_2_TO_3 = 5
 # Each template is a function that takes a lead dict and returns (subject, body)
 
 TEMPLATES = {
-    'intro': {
+    # --- All templates sell TradeTrackTemplate.com ---
+
+    'pain_point': {
         1: {
-            'subject': "Quick question for {business_name}",
+            'subject': "Quick question about invoicing at {business_name}",
             'body': """Hi {first_name},
 
-I came across {business_name} while researching top {trade} companies in {city}, and I was impressed by your work.
+Honest question — how many jobs has {business_name} completed in the last year where the invoice never got sent?
 
-I help tradespeople like you get more high-quality leads and jobs through targeted digital marketing — without the hassle of managing it yourself.
+I ask because I talk to {trade} owners in {city} all the time, and the answer is almost always "more than I'd like to admit."
 
-Would you be open to a quick 10-minute call this week to see if it's a fit?
+I built a simple spreadsheet system that makes it impossible to forget. Takes 3 minutes to set up, costs $97 once, and you own it forever.
 
-Best,
-{sender_name}
-{sender_title}"""
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
+{sender_name}"""
         },
         2: {
-            'subject': "Following up — {business_name}",
+            'subject': "That invoice you forgot to send",
             'body': """Hi {first_name},
 
-Just following up on my last email. I know you're busy running {business_name}, so I'll keep this brief.
+Following up — most {trade} businesses lose $1,200-$5,000 a year just from jobs they completed but forgot to bill for.
 
-I've helped several {trade} businesses in {state} increase their booked jobs by 30-50% using a simple outreach system. Happy to share how it works — no strings attached.
+TradeTrackTemplate is a dead-simple Google Sheets tracker that:
+- Shows overdue invoices at a glance
+- Tracks every job from quote to paid
+- Works on your phone between jobs
 
-Would a quick call work this week?
+One-time $97. No subscription, no software login.
 
-Best,
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
 {sender_name}"""
         },
         3: {
-            'subject': "Last note from me — {business_name}",
+            'subject': "Last note — {business_name}",
             'body': """Hi {first_name},
 
-I don't want to be a pest, so this will be my last email.
+Final email from me. If tracking jobs, invoices, and payments is a headache for {business_name}, check out TradeTrackTemplate.com.
 
-If getting more {trade} jobs in {city} is a priority for you, I'd love to help. Just reply "interested" and I'll send over some details.
+It's what I wish existed when I was helping {trade} pros get organized — simple, cheap, and you own it forever.
 
-Either way, wishing you and {business_name} continued success.
+Either way, best of luck with the business.
 
-Cheers,
 {sender_name}"""
         }
     },
-    'referral': {
+
+    'cost_savings': {
         1: {
-            'subject': "Referral partner opportunity — {trade} in {city}",
+            'subject': "Paying $149/month for job tracking?",
             'body': """Hi {first_name},
 
-I work with homeowners in {city} who regularly need {trade} services, and I'm looking for a reliable partner to refer them to.
+Quick question — is {business_name} currently paying for software like Jobber, ServiceTitan, or Housecall Pro?
 
-I found {business_name} online and your reviews caught my eye. Would you be interested in receiving qualified referrals?
+If so, you're probably spending $1,500-$2,000+ per year on features you barely use.
 
-Let me know and I can explain how it works.
+I built TradeTrackTemplate for {trade} pros who just need the basics: track jobs, send invoices, get paid. It's a one-time $97 purchase — no monthly fees, no contracts.
 
-Best,
-{sender_name}
-{sender_title}"""
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
+{sender_name}"""
         },
         2: {
-            'subject': "Re: Referral partner opportunity",
+            'subject': "Re: Monthly software costs",
             'body': """Hi {first_name},
 
-Quick follow-up — I have homeowners reaching out for {trade} work in the {city} area and wanted to make sure {business_name} had first dibs on these referrals.
+Just following up. Here's the math for {business_name}:
 
-No cost to you — just looking for a quality partner. Worth a quick chat?
+Jobber/ServiceTitan: ~$149/month = $1,788/year
+TradeTrackTemplate: $97 one-time
 
-Best,
+That's $1,691 saved in year one alone.
+
+It's a simple Google Sheets system — you can see every job, invoice status, and payment in one place. Works on your phone too.
+
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
 {sender_name}"""
         },
         3: {
-            'subject': "Closing the loop — {business_name}",
+            'subject': "One last thing — {business_name}",
             'body': """Hi {first_name},
 
-Haven't heard back so I'll assume the timing isn't right. No worries at all.
+Last email. If you ever get frustrated paying monthly fees for software that's more complicated than you need, check out TradeTrackTemplate.com.
 
-If you ever want to discuss a referral partnership for {trade} jobs in {city}, feel free to reach out anytime.
+$97 once, yours forever. Built specifically for {trade} businesses like {business_name}.
+
+Wishing you continued success,
+{sender_name}"""
+        }
+    },
+
+    'social_proof': {
+        1: {
+            'subject': "How {trade} pros in {state} are staying organized",
+            'body': """Hi {first_name},
+
+I've been working with {trade} owners across {state} who were drowning in sticky notes, texts, and forgotten invoices.
+
+The common thread? They didn't need fancy software — they needed something simple that actually worked.
+
+TradeTrackTemplate is a Google Sheets job tracker I built after watching too many good contractors lose money to admin chaos. One-time $97, takes 3 minutes to set up.
+
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
+{sender_name}"""
+        },
+        2: {
+            'subject': "What other {trade} owners are saying",
+            'body': """Hi {first_name},
+
+Quick follow-up. The most common feedback I get from {trade} pros using TradeTrackTemplate:
+
+"I can finally see which invoices are overdue without digging through emails."
+
+"Setup took less time than making coffee."
+
+"Wish I had this years ago."
+
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
+{sender_name}"""
+        },
+        3: {
+            'subject': "Final note for {business_name}",
+            'body': """Hi {first_name},
+
+Last email from me. If staying organized and not losing money to forgotten invoices sounds good, take a look at TradeTrackTemplate.com.
+
+It's what I wish existed for every {trade} business I've worked with — simple, affordable, and actually gets used.
 
 All the best,
 {sender_name}"""
         }
     },
-    'value_first': {
+
+    'direct': {
         1: {
-            'subject': "Free tip to get more {trade} jobs in {city}",
+            'subject': "Built this for {trade} pros like you",
             'body': """Hi {first_name},
 
-I've been researching the {trade} market in {city} and noticed that many businesses are missing out on a simple trick to rank higher in local Google searches.
+I found {business_name} while looking for {trade} businesses in {city} and wanted to reach out directly.
 
-Here's a quick win: make sure your Google Business Profile has at least 5 recent photos and responds to every review (even the good ones). Businesses that do this see 35% more calls on average.
+I built TradeTrackTemplate — a simple Google Sheets system that helps contractors track jobs, invoices, and payments without paying $150+/month for bloated software.
 
-I help {trade} businesses implement these kinds of strategies. Would you be open to a quick chat about what else {business_name} could do to stand out?
+It's $97 one-time. No subscriptions, no logins, works on your phone.
 
-Best,
-{sender_name}
-{sender_title}"""
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
+{sender_name}"""
         },
         2: {
-            'subject': "Another quick tip for {business_name}",
+            'subject': "Re: Job tracking for {business_name}",
             'body': """Hi {first_name},
 
-One more thing I noticed — having a simple "Request a Quote" form on your website can increase leads by 25%. Most homeowners prefer to submit a form over calling.
+Quick follow-up on my last email.
 
-I help businesses like {business_name} set these up and optimize them. Want me to put together a quick action plan for you? No charge.
+TradeTrackTemplate helps you:
+- Never forget to send an invoice
+- See which customers still owe you money
+- Track every job from quote to paid
 
-Best,
+Most {trade} pros set it up in under 5 minutes. $97 once, yours forever.
+
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
 {sender_name}"""
         },
         3: {
-            'subject': "Last idea for {business_name}",
+            'subject': "Last one from me",
             'body': """Hi {first_name},
 
-Last email from me — I wanted to leave you with one final suggestion. Asking happy customers to leave Google reviews (and making it easy with a direct link) is the #1 thing {trade} businesses can do to get more calls.
+Last email, I promise.
 
-If you ever want help putting a system in place for {business_name}, just reply to this email.
+If you're tired of sticky notes, scattered texts, and forgetting to bill customers — TradeTrackTemplate.com might help.
 
-Wishing you the best,
+$97 one-time, built specifically for {trade} pros who want something simple.
+
+Either way, wishing {business_name} continued success.
+
+{sender_name}"""
+        }
+    },
+
+    'admin_chaos': {
+        1: {
+            'subject': "Sticky notes and scattered texts?",
+            'body': """Hi {first_name},
+
+Running a {trade} business means you're juggling a lot — jobs, quotes, invoices, customer calls.
+
+If you're like most contractors I talk to, that info is scattered across sticky notes, text threads, and your head.
+
+I built TradeTrackTemplate to fix that. It's a simple Google Sheets tracker where you can see everything in one place. $97 once, no monthly fees.
+
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
+{sender_name}"""
+        },
+        2: {
+            'subject': "One place for everything",
+            'body': """Hi {first_name},
+
+Following up — imagine opening one spreadsheet and seeing:
+- Every active job and its status
+- Which invoices are overdue
+- How much money is coming in this month
+
+That's TradeTrackTemplate. Works on your phone between jobs, takes 3 minutes to set up.
+
+Most {trade} businesses lose $1,200+ a year to forgotten invoices alone. This fixes that.
+
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
+{sender_name}"""
+        },
+        3: {
+            'subject': "Final note — {business_name}",
+            'body': """Hi {first_name},
+
+Last email from me. If admin chaos is costing {business_name} time and money, check out TradeTrackTemplate.com.
+
+Simple job tracking for {trade} pros. $97 once, yours forever.
+
+Best of luck either way.
+
+{sender_name}"""
+        }
+    },
+
+    'time_savings': {
+        1: {
+            'subject': "5 hours a week on admin?",
+            'body': """Hi {first_name},
+
+Quick question — how much time does {business_name} spend each week tracking jobs, chasing invoices, and managing paperwork?
+
+Most {trade} owners I talk to say 5-10 hours. That's time you could be on a job site making money.
+
+I built TradeTrackTemplate to cut that down to minutes. It's a simple Google Sheets system that keeps everything organized. $97 one-time, no subscriptions.
+
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
+{sender_name}"""
+        },
+        2: {
+            'subject': "Time = money",
+            'body': """Hi {first_name},
+
+Following up. If you're spending 5 hours a week on admin at $50/hour, that's $13,000 a year in lost billable time.
+
+TradeTrackTemplate helps you:
+- Log jobs in 30 seconds
+- See overdue invoices at a glance
+- Track payments without digging through emails
+
+One-time $97. Pays for itself in the first week.
+
+Check it out at TradeTrackTemplate.com — or use our ROI calculator to see how much you're losing to admin chaos.
+
+{sender_name}"""
+        },
+        3: {
+            'subject': "Last note for {business_name}",
+            'body': """Hi {first_name},
+
+Final email. If you want to spend less time on paperwork and more time on jobs, take a look at TradeTrackTemplate.com.
+
+Built for {trade} pros who want something simple. $97 once, no monthly fees.
+
+Wishing you the best.
+
 {sender_name}"""
         }
     }
@@ -171,18 +329,18 @@ def _fill_template(template: dict, lead: dict, sender_name: str = '',
     return subject, body
 
 
-def generate_email_sequence(lead: dict, template_name: str = 'intro',
+def generate_email_sequence(lead: dict, template_name: str = 'pain_point',
                             sender_name: str = '', sender_title: str = '') -> list[dict]:
     """Generate a 3-email sequence for a lead.
 
     Returns list of dicts with keys: sequence_num, subject, body, scheduled_date
     """
-    template_set = TEMPLATES.get(template_name, TEMPLATES['intro'])
+    template_set = TEMPLATES.get(template_name, TEMPLATES['pain_point'])
     delay_1 = int(get_setting('delay_email_2', str(DEFAULT_DELAY_1_TO_2)))
     delay_2 = int(get_setting('delay_email_3', str(DEFAULT_DELAY_2_TO_3)))
 
-    # Check what emails already exist for this lead
-    existing = get_emails_for_lead(lead['id']) if lead.get('id') else []
+    # Check what emails already exist for this lead (exclude rejected so they can be regenerated)
+    existing = get_emails_for_lead(lead['id'], exclude_rejected=True) if lead.get('id') else []
     existing_nums = {e['sequence_num'] for e in existing}
 
     emails = []
@@ -215,7 +373,7 @@ def generate_email_sequence(lead: dict, template_name: str = 'intro',
     return emails
 
 
-def generate_and_save_emails(lead_ids: list[int], template_name: str = 'intro',
+def generate_and_save_emails(lead_ids: list[int], template_name: str = 'pain_point',
                              sender_name: str = '', sender_title: str = '') -> int:
     """Generate emails for multiple leads and save to database.
 
@@ -256,7 +414,7 @@ def preview_template(template_name: str, sequence_num: int = 1) -> dict:
         'city': 'Austin',
         'state': 'TX',
     }
-    template_set = TEMPLATES.get(template_name, TEMPLATES['intro'])
+    template_set = TEMPLATES.get(template_name, TEMPLATES['pain_point'])
     template = template_set.get(sequence_num, template_set[1])
-    subject, body = _fill_template(template, sample_lead, 'Your Name', 'Marketing Consultant')
+    subject, body = _fill_template(template, sample_lead, 'Your Name', '')
     return {'subject': subject, 'body': body}
