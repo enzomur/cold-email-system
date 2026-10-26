@@ -329,13 +329,31 @@ def _fill_template(template: dict, lead: dict, sender_name: str = '',
     return subject, body
 
 
+def _get_template_set(template_name: str) -> dict:
+    """Get template set by name, checking custom templates first."""
+    from backend.database import get_custom_template_by_name
+    # Check for custom template (override or custom)
+    custom = get_custom_template_by_name(template_name)
+    if custom and custom.get('sequences'):
+        # Convert custom format to TEMPLATES format
+        result = {}
+        for seq in custom['sequences']:
+            result[seq['sequence_num']] = {
+                'subject': seq['subject'],
+                'body': seq['body']
+            }
+        return result
+    # Fall back to system template
+    return TEMPLATES.get(template_name, TEMPLATES['pain_point'])
+
+
 def generate_email_sequence(lead: dict, template_name: str = 'pain_point',
                             sender_name: str = '', sender_title: str = '') -> list[dict]:
     """Generate a 3-email sequence for a lead.
 
     Returns list of dicts with keys: sequence_num, subject, body, scheduled_date
     """
-    template_set = TEMPLATES.get(template_name, TEMPLATES['pain_point'])
+    template_set = _get_template_set(template_name)
     delay_1 = int(get_setting('delay_email_2', str(DEFAULT_DELAY_1_TO_2)))
     delay_2 = int(get_setting('delay_email_3', str(DEFAULT_DELAY_2_TO_3)))
 
@@ -401,8 +419,18 @@ def generate_and_save_emails(lead_ids: list[int], template_name: str = 'pain_poi
 
 
 def get_template_names() -> list[str]:
-    """Return available template names."""
-    return list(TEMPLATES.keys())
+    """Return available template names (system + custom)."""
+    from backend.database import get_custom_templates
+    names = list(TEMPLATES.keys())
+    # Add custom template names that aren't overrides
+    try:
+        custom = get_custom_templates()
+        for t in custom:
+            if not t.get('is_override') and t['name'] not in names:
+                names.append(t['name'])
+    except Exception:
+        pass  # Database might not be initialized yet
+    return names
 
 
 def preview_template(template_name: str, sequence_num: int = 1) -> dict:
@@ -414,7 +442,7 @@ def preview_template(template_name: str, sequence_num: int = 1) -> dict:
         'city': 'Austin',
         'state': 'TX',
     }
-    template_set = TEMPLATES.get(template_name, TEMPLATES['pain_point'])
-    template = template_set.get(sequence_num, template_set[1])
+    template_set = _get_template_set(template_name)
+    template = template_set.get(sequence_num, template_set.get(1, {'subject': '', 'body': ''}))
     subject, body = _fill_template(template, sample_lead, 'Your Name', '')
     return {'subject': subject, 'body': body}

@@ -16,40 +16,40 @@
 <!-- Filters -->
 <form method="GET" class="flex flex-wrap gap-3 mb-4">
     <input type="text" name="search" value="{{ filters.get('search', '') }}" placeholder="Search..."
-           class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
-    <select name="tier" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+           class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-gray-800 focus:ring-2 focus:ring-brand focus:border-brand">
+    <select name="tier" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-gray-800">
         <option value="">All Tiers</option>
         <option value="hot" {{ 'selected' if filters.get('tier') == 'hot' }}>Hot</option>
         <option value="warm" {{ 'selected' if filters.get('tier') == 'warm' }}>Warm</option>
         <option value="cool" {{ 'selected' if filters.get('tier') == 'cool' }}>Cool</option>
         <option value="skip" {{ 'selected' if filters.get('tier') == 'skip' }}>Skip</option>
     </select>
-    <select name="status" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+    <select name="status" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-gray-800">
         <option value="">All Status</option>
         {% for s in ['new', 'contacted', 'replied', 'converted', 'not_interested'] %}
         <option value="{{ s }}" {{ 'selected' if filters.get('status') == s }}>{{ s|replace('_', ' ')|title }}</option>
         {% endfor %}
     </select>
-    <select name="trade" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+    <select name="trade" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-gray-800">
         <option value="">All Trades</option>
         {% for t in ['electrician', 'plumber', 'hvac', 'roofer', 'general contractor', 'handyman'] %}
         <option value="{{ t }}" {{ 'selected' if filters.get('trade') == t }}>{{ t|title }}</option>
         {% endfor %}
     </select>
     <label class="flex items-center gap-1 text-sm">
-        <input type="checkbox" name="has_email" value="1" {{ 'checked' if filters.get('has_email') }} class="rounded border-gray-300 text-brand">
+        <input type="checkbox" name="has_email" value="1" {{ 'checked' if filters.get('has_email') }} class="rounded border-gray-300 dark:border-gray-600 text-brand">
         Has Email
     </label>
-    <button type="submit" class="px-4 py-1.5 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm">Filter</button>
-    <a href="/leads" class="px-4 py-1.5 text-gray-500 hover:text-gray-700 text-sm">Clear</a>
+    <button type="submit" class="px-4 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-sm">Filter</button>
+    <a href="/leads" class="px-4 py-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-sm">Clear</a>
 </form>
 
 <!-- Table -->
-<div class="overflow-x-auto border border-gray-200 rounded-lg">
+<div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
     <table class="w-full text-sm">
-        <thead class="bg-gray-50">
+        <thead class="bg-gray-50 dark:bg-gray-800">
             <tr>
-                <th class="p-3 text-left"><input type="checkbox" id="select-all" class="rounded border-gray-300"></th>
+                <th class="p-3 text-left"><input type="checkbox" id="select-all" class="rounded border-gray-300 dark:border-gray-600"></th>
                 <th class="p-3 text-left">Tier</th>
                 <th class="p-3 text-left">Score</th>
                 <th class="p-3 text-left">Business</th>
@@ -61,10 +61,10 @@
                 <th class="p-3 text-left">Status</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="bg-white dark:bg-gray-900">
             {% for lead in leads %}
-            <tr class="border-t border-gray-100 hover:bg-gray-50">
-                <td class="p-3"><input type="checkbox" class="lead-cb rounded border-gray-300" value="{{ lead.id }}"></td>
+            <tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800">
+                <td class="p-3"><input type="checkbox" class="lead-cb rounded border-gray-300 dark:border-gray-600" value="{{ lead.id }}"></td>
                 <td class="p-3">
                     <span class="px-2 py-0.5 rounded-full text-xs font-semibold
                         {% if lead.lead_tier == 'hot' %}bg-green-100 text-green-800
@@ -74,11 +74,11 @@
                         {{ lead.lead_tier|upper }}
                     </span>
                 </td>
-                <td class="p-3 font-mono text-gray-700">{{ lead.lead_score }}</td>
+                <td class="p-3 font-mono text-gray-700 dark:text-gray-300">{{ lead.lead_score }}</td>
                 <td class="p-3">
                     <span class="font-medium">{{ lead.business_name }}</span>
                     {% if lead.contact_name %}
-                    <span class="block text-xs text-gray-500">{{ lead.contact_name }}</span>
+                    <span class="block text-xs text-gray-500 dark:text-gray-400">{{ lead.contact_name }}</span>
                     {% endif %}
                 </td>
                 <td class="p-3">
@@ -88,10 +88,10 @@
                     <span class="text-red-400 cursor-pointer hover:underline" onclick="editLead({{ lead.id }}, event)">+ Add Email</span>
                     {% endif %}
                 </td>
-                <td class="p-3 text-gray-600">{{ lead.phone or '—' }}</td>
-                <td class="p-3 text-gray-600">{{ lead.city }}{% if lead.state %}, {{ lead.state }}{% endif %}</td>
+                <td class="p-3 text-gray-600 dark:text-gray-400">{{ lead.phone or '—' }}</td>
+                <td class="p-3 text-gray-600 dark:text-gray-400">{{ lead.city }}{% if lead.state %}, {{ lead.state }}{% endif %}</td>
                 <td class="p-3">{{ lead.trade }}</td>
-                <td class="p-3 text-gray-600">{{ lead.review_count or '—' }}</td>
+                <td class="p-3 text-gray-600 dark:text-gray-400">{{ lead.review_count or '—' }}</td>
                 <td class="p-3">
                     <span class="px-2 py-0.5 rounded-full text-xs font-medium
                         {% if lead.status == 'new' %}bg-blue-50 text-blue-700
@@ -112,36 +112,36 @@
 
 <!-- Edit Lead Modal -->
 <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 m-4">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 m-4">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold">Edit Lead</h3>
-            <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl">&times;</button>
         </div>
         <form id="edit-form" class="space-y-4">
             <input type="hidden" id="edit-lead-id">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
-                <input type="text" id="edit-business-name" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" readonly>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Business Name</label>
+                <input type="text" id="edit-business-name" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700" readonly>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Contact Name</label>
-                <input type="text" id="edit-contact-name" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contact Name</label>
+                <input type="text" id="edit-contact-name" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-brand focus:border-brand">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
-                <input type="email" id="edit-email" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand" placeholder="Enter email address">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email <span class="text-red-500">*</span></label>
+                <input type="email" id="edit-email" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-brand focus:border-brand" placeholder="Enter email address">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                <input type="text" id="edit-phone" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                <input type="text" id="edit-phone" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-brand focus:border-brand">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                <textarea id="edit-notes" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand focus:border-brand"></textarea>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+                <textarea id="edit-notes" rows="2" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 focus:ring-2 focus:ring-brand focus:border-brand"></textarea>
             </div>
             <div class="flex gap-3 pt-2">
                 <button type="submit" class="flex-1 px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 font-medium">Save</button>
-                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium">Cancel</button>
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 font-medium">Cancel</button>
             </div>
         </form>
     </div>

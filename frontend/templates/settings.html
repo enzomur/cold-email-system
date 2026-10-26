@@ -5,79 +5,79 @@
 
 <div class="max-w-2xl space-y-8">
     <!-- API Connections -->
-    <div class="border border-gray-200 rounded-lg p-5">
+    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-white dark:bg-gray-800">
         <h3 class="font-semibold mb-4">API Connections</h3>
         <div class="space-y-3">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="font-medium">Gmail API</p>
-                    <p class="text-sm text-gray-500">Send emails via your Gmail account</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Send emails via your Gmail account</p>
                 </div>
-                <span class="px-3 py-1 rounded-full text-sm font-medium {{ 'bg-green-50 text-green-700' if gmail_connected else 'bg-red-50 text-red-600' }}">
+                <span class="px-3 py-1 rounded-full text-sm font-medium {{ 'bg-green-50 dark:bg-green-900/50 text-green-700 dark:text-green-400' if gmail_connected else 'bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-400' }}">
                     {{ 'Connected' if gmail_connected else 'Not Connected' }}
                 </span>
             </div>
             <div class="flex items-center justify-between">
                 <div>
                     <p class="font-medium">Google Sheets</p>
-                    <p class="text-sm text-gray-500">Sync leads bidirectionally</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Sync leads bidirectionally</p>
                 </div>
-                <span class="px-3 py-1 rounded-full text-sm font-medium {{ 'bg-green-50 text-green-700' if sheets_connected else 'bg-red-50 text-red-600' }}">
+                <span class="px-3 py-1 rounded-full text-sm font-medium {{ 'bg-green-50 dark:bg-green-900/50 text-green-700 dark:text-green-400' if sheets_connected else 'bg-red-50 dark:bg-red-900/50 text-red-600 dark:text-red-400' }}">
                     {{ 'Connected' if sheets_connected else 'Not Connected' }}
                 </span>
             </div>
             {% if not gmail_connected or not sheets_connected %}
-            <p class="text-sm text-gray-500 mt-2">Run <code class="bg-gray-100 px-1 rounded">python setup_wizard.py</code> to connect Google APIs.</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Run <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">python setup_wizard.py</code> to connect Google APIs.</p>
             {% endif %}
         </div>
     </div>
 
     <!-- Sheets Sync -->
-    <div class="border border-gray-200 rounded-lg p-5">
+    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-white dark:bg-gray-800">
         <h3 class="font-semibold mb-4">Google Sheets Sync</h3>
         <div class="flex gap-3">
             <button onclick="exportSheets()" class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 text-sm">
                 Export Leads to Sheet
             </button>
-            <button onclick="importSheets()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm">
+            <button onclick="importSheets()" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-sm">
                 Import from Sheet
             </button>
         </div>
     </div>
 
     <!-- Email Settings -->
-    <form id="settings-form" class="border border-gray-200 rounded-lg p-5">
+    <form id="settings-form" class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-white dark:bg-gray-800">
         <h3 class="font-semibold mb-4">Email Settings</h3>
         <div class="space-y-4" id="settings-fields">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Sender Name</label>
-                <input type="text" name="sender_name" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sender Name</label>
+                <input type="text" name="sender_name" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700"
                        placeholder="Your Name">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Sender Title</label>
-                <input type="text" name="sender_title" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sender Title</label>
+                <input type="text" name="sender_title" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700"
                        placeholder="Marketing Consultant">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Send-From Email</label>
-                <input type="email" name="send_from_email" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Send-From Email</label>
+                <input type="email" name="send_from_email" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700"
                        placeholder="you@gmail.com">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Daily Send Limit</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Daily Send Limit</label>
                 <input type="number" name="daily_send_limit" value="30" min="1" max="100"
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                       class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Delay: Email 1 → 2 (days)</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Delay: Email 1 → 2 (days)</label>
                 <input type="number" name="delay_email_2" value="3" min="1" max="30"
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                       class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Delay: Email 2 → 3 (days)</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Delay: Email 2 → 3 (days)</label>
                 <input type="number" name="delay_email_3" value="5" min="1" max="30"
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                       class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700">
             </div>
         </div>
         <button type="submit" class="mt-4 px-6 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 text-sm font-medium">

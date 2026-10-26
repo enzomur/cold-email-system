@@ -93,6 +93,8 @@ def init_db():
     """)
     conn.commit()
     conn.close()
+    # Initialize custom templates tables
+    init_custom_templates()
 
 
 def _migrate_leads_table(conn):
@@ -448,3 +450,221 @@ def set_setting(key: str, value: str):
     )
     conn.commit()
     conn.close()
+
+
+# --- Custom Templates ---
+
+def init_custom_templates():
+    """Create custom templates tables if they don't exist."""
+    conn = get_db()
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS custom_templates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            display_name TEXT NOT NULL,
+            description TEXT,
+            is_override INTEGER DEFAULT 0,
+            created_date TEXT NOT NULL,
+            updated_date TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS custom_template_sequences (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            template_id INTEGER NOT NULL,
+            sequence_num INTEGER NOT NULL,
+            subject TEXT NOT NULL,
+            body TEXT NOT NULL,
+            FOREIGN KEY (template_id) REFERENCES custom_templates(id),
+            UNIQUE(template_id, sequence_num)
+        );
+    """)
+    conn.commit()
+    conn.close()
+
+
+def get_custom_templates() -> list[dict]:
+    """Get all custom templates with their sequences."""
+    conn = get_db()
+    templates = conn.execute("SELECT * FROM custom_templates ORDER BY name").fetchall()
+
+    result = []
+    for t in templates:
+        t_dict = dict(t)
+        t_dict['sequences'] = [dict(s) for s in conn.execute("""
+            SELECT * FROM custom_template_sequences
+            WHERE template_id = ? ORDER BY sequence_num
+        """, (t['id'],)).fetchall()]
+        result.append(t_dict)
+
+    conn.close()
+    return result
+
+
+def get_custom_template(template_id: int) -> dict | None:
+    """Get a single custom template with sequences."""
+    conn = get_db()
+    template = conn.execute(
+        "SELECT * FROM custom_templates WHERE id = ?", (template_id,)
+    ).fetchone()
+
+    if not template:
+        conn.close()
+        return None
+
+    result = dict(template)
+    result['sequences'] = [dict(s) for s in conn.execute("""
+        SELECT * FROM custom_template_sequences
+        WHERE template_id = ? ORDER BY sequence_num
+    """, (template_id,)).fetchall()]
+
+    conn.close()
+    return result
+
+
+def get_custom_template_by_name(name: str) -> dict | None:
+    """Get a custom template by name with sequences."""
+    conn = get_db()
+    template = conn.execute(
+        "SELECT * FROM custom_templates WHERE name = ?", (name,)
+    ).fetchone()
+
+    if not template:
+        conn.close()
+        return None
+
+    result = dict(template)
+    result['sequences'] = [dict(s) for s in conn.execute("""
+        SELECT * FROM custom_template_sequences
+        WHERE template_id = ? ORDER BY sequence_num
+    """, (template['id'],)).fetchall()]
+
+    conn.close()
+    return result
+
+
+def save_custom_template(name: str, display_name: str, description: str,
+                         sequences: list[dict], is_override: bool = False) -> int:
+    """Create or update a custom template. Returns template ID."""
+    conn = get_db()
+    now = datetime.now().isoformat()
+
+    existing = conn.execute(
+        "SELECT id FROM custom_templates WHERE name = ?", (name,)
+    ).fetchone()
+
+    if existing:
+        template_id = existing['id']
+        conn.execute("""
+            UPDATE custom_templates
+            SET display_name = ?, description = ?, updated_date = ?, is_override = ?
+            WHERE id = ?
+        """, (display_name, description, now, 1 if is_override else 0, template_id))
+        conn.execute("DELETE FROM custom_template_sequences WHERE template_id = ?", (template_id,))
+    else:
+        cur = conn.execute("""
+            INSERT INTO custom_templates (name, display_name, description, is_override, created_date, updated_date)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (name, display_name, description, 1 if is_override else 0, now, now))
+        template_id = cur.lastrowid
+
+    for seq in sequences:
+        conn.execute("""
+            INSERT INTO custom_template_sequences (template_id, sequence_num, subject, body)
+            VALUES (?, ?, ?, ?)
+        """, (template_id, seq['sequence_num'], seq['subject'], seq['body']))
+
+    conn.commit()
+    conn.close()
+    return template_id
+
+
+def delete_custom_template(template_id: int):
+    """Delete a custom template and its sequences."""
+    conn = get_db()
+    conn.execute("DELETE FROM custom_template_sequences WHERE template_id = ?", (template_id,))
+    conn.execute("DELETE FROM custom_templates WHERE id = ?", (template_id,))
+    conn.commit()
+    conn.close()
+
+
+# --- Map Data Aggregation ---
+
+def get_leads_by_state(trade_filter: str = '') -> dict:
+    """Aggregate lead data by state for map visualization.
+
+    Returns dict like:
+    {
+        'TX': {
+            'confidence_score': 85,
+            'hot': 12,
+            'warm': 8,
+            'cool': 15,
+            'skip': 3,
+            'total': 38,
+            'top_cities': ['Austin', 'Houston', 'Dallas']
+        },
+        ...
+    }
+    """
+    conn = get_db()
+
+    where_clause = "WHERE state != '' AND state IS NOT NULL"
+    params = []
+    if trade_filter:
+        where_clause += " AND trade = ?"
+        params.append(trade_filter)
+
+    # Get counts by state and tier
+    rows = conn.execute(f"""
+        SELECT
+            state,
+            lead_tier,
+            COUNT(*) as count
+        FROM leads
+        {where_clause}
+        GROUP BY state, lead_tier
+    """, params).fetchall()
+
+    # Get top cities per state
+    city_rows = conn.execute(f"""
+        SELECT state, city, COUNT(*) as cnt
+        FROM leads
+        {where_clause} AND city != ''
+        GROUP BY state, city
+        ORDER BY state, cnt DESC
+    """, params).fetchall()
+
+    conn.close()
+
+    # Build result dict
+    result = {}
+    for row in rows:
+        state = row['state'].upper()[:2] if row['state'] else ''
+        if not state:
+            continue
+        if state not in result:
+            result[state] = {'hot': 0, 'warm': 0, 'cool': 0, 'skip': 0, 'total': 0}
+        tier = row['lead_tier'] or 'cool'
+        if tier in result[state]:
+            result[state][tier] = row['count']
+        result[state]['total'] += row['count']
+
+    # Calculate confidence score for each state
+    for state, data in result.items():
+        data['confidence_score'] = (data['hot'] * 3) + (data['warm'] * 2) + (data['cool'] * 1)
+
+    # Add top cities
+    cities_by_state = {}
+    for row in city_rows:
+        state = row['state'].upper()[:2] if row['state'] else ''
+        if not state:
+            continue
+        if state not in cities_by_state:
+            cities_by_state[state] = []
+        if len(cities_by_state[state]) < 3:
+            cities_by_state[state].append(row['city'])
+
+    for state in result:
+        result[state]['top_cities'] = cities_by_state.get(state, [])
+
+    return result

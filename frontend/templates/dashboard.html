@@ -4,80 +4,80 @@
 <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
 
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-        <p class="text-sm text-gray-500">Total Leads</p>
-        <p class="text-3xl font-bold text-gray-900">{{ stats.total_leads }}</p>
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Total Leads</p>
+        <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.total_leads }}</p>
     </div>
-    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-        <p class="text-sm text-gray-500">With Email</p>
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <p class="text-sm text-gray-500 dark:text-gray-400">With Email</p>
         <p class="text-3xl font-bold text-brand">{{ stats.leads_with_email }}</p>
     </div>
-    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-        <p class="text-sm text-gray-500">In Queue</p>
-        <p class="text-3xl font-bold text-yellow-600">{{ stats.emails_in_queue }}</p>
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <p class="text-sm text-gray-500 dark:text-gray-400">In Queue</p>
+        <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-500">{{ stats.emails_in_queue }}</p>
     </div>
-    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-        <p class="text-sm text-gray-500">Sent Today</p>
-        <p class="text-3xl font-bold text-green-600">{{ stats.emails_sent_today }}</p>
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <p class="text-sm text-gray-500 dark:text-gray-400">Sent Today</p>
+        <p class="text-3xl font-bold text-green-600 dark:text-green-500">{{ stats.emails_sent_today }}</p>
     </div>
 </div>
 
 <div class="grid grid-cols-4 gap-4 mb-8">
-    <a href="/leads?tier=hot" class="rounded-lg p-3 border border-green-200 bg-green-50 hover:bg-green-100 transition">
-        <p class="text-xs text-green-700 font-medium">Hot Leads</p>
-        <p class="text-2xl font-bold text-green-800">{{ stats.leads_hot }}</p>
+    <a href="/leads?tier=hot" class="rounded-lg p-3 border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 transition">
+        <p class="text-xs text-green-700 dark:text-green-400 font-medium">Hot Leads</p>
+        <p class="text-2xl font-bold text-green-800 dark:text-green-300">{{ stats.leads_hot }}</p>
     </a>
-    <a href="/leads?tier=warm" class="rounded-lg p-3 border border-yellow-200 bg-yellow-50 hover:bg-yellow-100 transition">
-        <p class="text-xs text-yellow-700 font-medium">Warm Leads</p>
-        <p class="text-2xl font-bold text-yellow-800">{{ stats.leads_warm }}</p>
+    <a href="/leads?tier=warm" class="rounded-lg p-3 border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/30 hover:bg-yellow-100 dark:hover:bg-yellow-900/50 transition">
+        <p class="text-xs text-yellow-700 dark:text-yellow-400 font-medium">Warm Leads</p>
+        <p class="text-2xl font-bold text-yellow-800 dark:text-yellow-300">{{ stats.leads_warm }}</p>
     </a>
-    <a href="/leads?tier=cool" class="rounded-lg p-3 border border-gray-200 bg-gray-50 hover:bg-gray-100 transition">
-        <p class="text-xs text-gray-500 font-medium">Cool Leads</p>
-        <p class="text-2xl font-bold text-gray-600">{{ stats.leads_cool }}</p>
+    <a href="/leads?tier=cool" class="rounded-lg p-3 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+        <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Cool Leads</p>
+        <p class="text-2xl font-bold text-gray-600 dark:text-gray-300">{{ stats.leads_cool }}</p>
     </a>
-    <div class="rounded-lg p-3 border border-red-100 bg-red-50">
+    <div class="rounded-lg p-3 border border-red-100 dark:border-red-900 bg-red-50 dark:bg-red-900/30">
         <p class="text-xs text-red-400 font-medium">Skipped</p>
         <p class="text-2xl font-bold text-red-400">{{ stats.leads_skip }}</p>
     </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div class="border border-gray-200 rounded-lg p-5">
+    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-white dark:bg-gray-800">
         <h3 class="font-semibold mb-3">Email Performance</h3>
         <div class="space-y-3">
             <div class="flex justify-between">
-                <span class="text-gray-500">Total Sent</span>
+                <span class="text-gray-500 dark:text-gray-400">Total Sent</span>
                 <span class="font-medium">{{ stats.emails_sent_total }}</span>
             </div>
             <div class="flex justify-between">
-                <span class="text-gray-500">Approved (Ready)</span>
+                <span class="text-gray-500 dark:text-gray-400">Approved (Ready)</span>
                 <span class="font-medium text-brand">{{ stats.emails_approved }}</span>
             </div>
             <div class="flex justify-between">
-                <span class="text-gray-500">Replies</span>
-                <span class="font-medium text-green-600">{{ stats.replies }}</span>
+                <span class="text-gray-500 dark:text-gray-400">Replies</span>
+                <span class="font-medium text-green-600 dark:text-green-500">{{ stats.replies }}</span>
             </div>
             <div class="flex justify-between">
-                <span class="text-gray-500">Reply Rate</span>
+                <span class="text-gray-500 dark:text-gray-400">Reply Rate</span>
                 <span class="font-medium">{{ stats.reply_rate }}%</span>
             </div>
             <div class="flex justify-between">
-                <span class="text-gray-500">Conversions</span>
-                <span class="font-medium text-green-600">{{ stats.conversions }}</span>
+                <span class="text-gray-500 dark:text-gray-400">Conversions</span>
+                <span class="font-medium text-green-600 dark:text-green-500">{{ stats.conversions }}</span>
             </div>
         </div>
     </div>
 
-    <div class="border border-gray-200 rounded-lg p-5">
+    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-white dark:bg-gray-800">
         <h3 class="font-semibold mb-3">Quick Actions</h3>
         <div class="space-y-2">
             <a href="/scrape" class="block w-full text-left px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 transition">
                 Scrape New Leads
             </a>
-            <a href="/queue" class="block w-full text-left px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+            <a href="/queue" class="block w-full text-left px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
                 Review Email Queue ({{ stats.emails_in_queue }})
             </a>
-            <button onclick="sendApproved()" class="w-full text-left px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition">
+            <button onclick="sendApproved()" class="w-full text-left px-4 py-2 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/50 transition">
                 Send Approved Emails ({{ stats.emails_approved }})
             </button>
         </div>

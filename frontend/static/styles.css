@@ -22,6 +22,24 @@
     font-weight: 500;
 }
 
+/* Dark mode nav links */
+:root.dark .nav-link,
+html.dark .nav-link {
+    color: #9ca3af;
+}
+
+:root.dark .nav-link:hover,
+html.dark .nav-link:hover {
+    background-color: #374151;
+    color: #f3f4f6;
+}
+
+:root.dark .nav-link.active,
+html.dark .nav-link.active {
+    background-color: #1e3a5f;
+    color: #60a5fa;
+}
+
 /* Scrollbar */
 main::-webkit-scrollbar {
     width: 6px;
@@ -32,4 +50,10 @@ main::-webkit-scrollbar-track {
 main::-webkit-scrollbar-thumb {
     background: #d1d5db;
     border-radius: 3px;
+}
+
+/* Dark mode scrollbar */
+:root.dark main::-webkit-scrollbar-thumb,
+html.dark main::-webkit-scrollbar-thumb {
+    background: #4b5563;
 }

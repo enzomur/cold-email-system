@@ -4,13 +4,13 @@
 <div class="flex items-center justify-between mb-6">
     <h2 class="text-2xl font-bold">Email Queue <span class="text-gray-400 text-lg font-normal">({{ emails|length }})</span></h2>
     <div class="flex gap-2 items-center">
-        <label class="flex items-center gap-1 text-sm text-gray-600">
+        <label class="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
             <input type="checkbox" id="include-cool" {{ 'checked' if include_cool }}
-                   onchange="toggleCool()" class="rounded border-gray-300 text-brand">
+                   onchange="toggleCool()" class="rounded border-gray-300 dark:border-gray-600 text-brand">
             Include Cool
         </label>
         <select id="status-filter" onchange="updateQueue()"
-                class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800">
             <option value="pending_review" {{ 'selected' if current_status == 'pending_review' }}>Pending Review</option>
             <option value="approved" {{ 'selected' if current_status == 'approved' }}>Approved</option>
             <option value="rejected" {{ 'selected' if current_status == 'rejected' }}>Rejected</option>
@@ -24,51 +24,51 @@
             Send All
         </button>
         {% endif %}
-        <button onclick="clearAll()" class="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 text-sm font-medium">
+        <button onclick="clearAll()" class="px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 text-sm font-medium">
             Clear All
         </button>
     </div>
 </div>
 
-<p class="text-xs text-gray-500 mb-4">Showing Hot and Warm leads{{ ' + Cool' if include_cool else '' }}. Skip leads are always excluded.</p>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Showing Hot and Warm leads{{ ' + Cool' if include_cool else '' }}. Skip leads are always excluded.</p>
 
 <div class="space-y-4">
     {% for email in emails %}
-    <div class="border border-gray-200 rounded-lg p-5" id="email-card-{{ email.id }}">
+    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-white dark:bg-gray-800" id="email-card-{{ email.id }}">
         <div class="flex items-start justify-between mb-3">
             <div>
                 <div class="flex items-center gap-2">
                     <p class="font-semibold">{{ email.business_name }}</p>
                     <span class="px-2 py-0.5 rounded-full text-xs font-semibold
-                        {% if email.lead_tier == 'hot' %}bg-green-100 text-green-800
-                        {% elif email.lead_tier == 'warm' %}bg-yellow-100 text-yellow-800
-                        {% else %}bg-gray-100 text-gray-600{% endif %}">
+                        {% if email.lead_tier == 'hot' %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300
+                        {% elif email.lead_tier == 'warm' %}bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300
+                        {% else %}bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300{% endif %}">
                         {{ email.lead_tier|upper }}
                     </span>
                     <span class="text-xs text-gray-400 font-mono">{{ email.lead_score }}pts</span>
                 </div>
-                <p class="text-sm text-gray-500">{{ email.lead_email }} &middot; {{ email.trade }} &middot; {{ email.city }}, {{ email.state }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ email.lead_email }} &middot; {{ email.trade }} &middot; {{ email.city }}, {{ email.state }}</p>
                 <p class="text-xs text-gray-400 mt-1">Sequence #{{ email.sequence_num }}</p>
             </div>
             <div class="flex gap-2">
                 {% if current_status == 'pending_review' %}
-                <button onclick="approveEmail({{ email.id }})" class="px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 text-sm">Approve</button>
-                <button onclick="rejectEmail({{ email.id }})" class="px-3 py-1 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 text-sm">Reject</button>
+                <button onclick="approveEmail({{ email.id }})" class="px-3 py-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/50 text-sm">Approve</button>
+                <button onclick="rejectEmail({{ email.id }})" class="px-3 py-1 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 text-sm">Reject</button>
                 {% endif %}
             </div>
         </div>
-        <div class="bg-gray-50 rounded-lg p-4">
-            <p class="text-sm font-medium text-gray-700 mb-2">Subject: {{ email.subject }}</p>
-            <div class="text-sm text-gray-600 whitespace-pre-line" id="body-{{ email.id }}">{{ email.body }}</div>
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject: {{ email.subject }}</p>
+            <div class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line" id="body-{{ email.id }}">{{ email.body }}</div>
         </div>
         <div class="mt-2">
             <button onclick="toggleEdit({{ email.id }})" class="text-xs text-brand hover:underline">Edit</button>
         </div>
         <div id="edit-{{ email.id }}" class="hidden mt-3 space-y-2">
             <input type="text" id="edit-subject-{{ email.id }}" value="{{ email.subject }}"
-                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                   class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700">
             <textarea id="edit-body-{{ email.id }}" rows="8"
-                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">{{ email.body }}</textarea>
+                      class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700">{{ email.body }}</textarea>
             <button onclick="saveEdit({{ email.id }})" class="px-4 py-1.5 bg-brand text-white rounded-lg text-sm">Save</button>
         </div>
     </div>

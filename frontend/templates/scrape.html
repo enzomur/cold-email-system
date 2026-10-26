@@ -6,8 +6,8 @@
 <div class="max-w-2xl">
     <form id="scrape-form" class="space-y-4">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Trade / Profession</label>
-            <select name="trade" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Trade / Profession</label>
+            <select name="trade" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-brand focus:border-brand">
                 <option value="electrician">Electrician</option>
                 <option value="plumber">Plumber</option>
                 <option value="hvac">HVAC Contractor</option>
@@ -17,35 +17,35 @@
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Location (City, ST)</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location (City, ST)</label>
             <input type="text" name="location" placeholder="Austin, TX" required
-                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+                   class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-brand focus:border-brand">
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Max Results per Source</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max Results per Source</label>
             <input type="number" name="max_results" value="20" min="5" max="100"
-                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand focus:border-brand">
+                   class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-brand focus:border-brand">
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Sources</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sources</label>
             <div class="space-y-2">
                 <label class="flex items-center gap-2">
-                    <input type="checkbox" name="sources" value="google_maps" checked class="rounded border-gray-300 text-brand focus:ring-brand">
+                    <input type="checkbox" name="sources" value="google_maps" checked class="rounded border-gray-300 dark:border-gray-600 text-brand focus:ring-brand">
                     Google Maps
                 </label>
                 <label class="flex items-center gap-2">
-                    <input type="checkbox" name="sources" value="yelp" checked class="rounded border-gray-300 text-brand focus:ring-brand">
+                    <input type="checkbox" name="sources" value="yelp" checked class="rounded border-gray-300 dark:border-gray-600 text-brand focus:ring-brand">
                     Yelp
                 </label>
                 <label class="flex items-center gap-2">
-                    <input type="checkbox" name="sources" value="license_dbs" class="rounded border-gray-300 text-brand focus:ring-brand">
+                    <input type="checkbox" name="sources" value="license_dbs" class="rounded border-gray-300 dark:border-gray-600 text-brand focus:ring-brand">
                     License Databases (CA/TX/FL)
                 </label>
             </div>
         </div>
         <div>
             <label class="flex items-center gap-2">
-                <input type="checkbox" name="find_emails" checked class="rounded border-gray-300 text-brand focus:ring-brand">
+                <input type="checkbox" name="find_emails" checked class="rounded border-gray-300 dark:border-gray-600 text-brand focus:ring-brand">
                 <span class="text-sm">Find email addresses from websites</span>
             </label>
         </div>
@@ -56,25 +56,25 @@
     </form>
 
     <!-- Progress -->
-    <div id="scrape-progress" class="hidden mt-6 border border-gray-200 rounded-lg p-4">
+    <div id="scrape-progress" class="hidden mt-6 border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
         <div class="flex items-center gap-3 mb-2">
             <div id="progress-spinner" class="animate-spin h-5 w-5 border-2 border-brand border-t-transparent rounded-full"></div>
-            <span id="progress-message" class="text-sm text-gray-600">Starting...</span>
+            <span id="progress-message" class="text-sm text-gray-600 dark:text-gray-300">Starting...</span>
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-2">
+        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div id="progress-bar" class="bg-brand h-2 rounded-full transition-all" style="width: 0%"></div>
         </div>
-        <p id="progress-count" class="text-xs text-gray-500 mt-1"></p>
+        <p id="progress-count" class="text-xs text-gray-500 dark:text-gray-400 mt-1"></p>
     </div>
 
     <!-- Results -->
-    <div id="scrape-results" class="hidden mt-6 border border-green-200 bg-green-50 rounded-lg p-4">
-        <p id="results-text" class="text-green-800 font-medium"></p>
+    <div id="scrape-results" class="hidden mt-6 border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/30 rounded-lg p-4">
+        <p id="results-text" class="text-green-800 dark:text-green-300 font-medium"></p>
         <div id="tier-summary" class="hidden flex gap-3 mt-2">
-            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800" id="tier-hot"></span>
-            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800" id="tier-warm"></span>
-            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600" id="tier-cool"></span>
-            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-500" id="tier-skip"></span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300" id="tier-hot"></span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300" id="tier-warm"></span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300" id="tier-cool"></span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-900/50 text-red-500 dark:text-red-400" id="tier-skip"></span>
         </div>
         <a href="/leads" class="inline-block mt-2 text-brand hover:underline text-sm">View leads &rarr;</a>
     </div>

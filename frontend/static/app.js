@@ -1,5 +1,16 @@
 /* Global client-side utilities */
 
+// Theme toggle
+function toggleTheme() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('theme-toggle');
+    if (toggle) toggle.addEventListener('click', toggleTheme);
+});
+
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     if (!container) return;

@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+{% block title %}Email Templates — Cold Email{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-bold">Email Templates</h2>
+    <button onclick="openNewTemplateModal()" class="px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+        + New Template
+    </button>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Template List -->
+    <div class="lg:col-span-1 space-y-4">
+        <h3 class="font-semibold text-gray-500 dark:text-gray-400 text-sm uppercase tracking-wide">System Templates</h3>
+        {% for t in system_templates %}
+        <div onclick="selectTemplate('system', '{{ t.name }}')"
+             class="template-card p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-brand transition bg-white dark:bg-gray-800"
+             data-type="system" data-name="{{ t.name }}">
+            <p class="font-medium">{{ t.display_name }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">3-email sequence</p>
+            <span class="inline-block mt-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded">System</span>
+        </div>
+        {% endfor %}
+
+        {% if custom_templates %}
+        <h3 class="font-semibold text-gray-500 dark:text-gray-400 text-sm uppercase tracking-wide mt-6">Custom Templates</h3>
+        {% for t in custom_templates %}
+        <div onclick="selectTemplate('custom', {{ t.id }})"
+             class="template-card p-4 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:border-brand transition bg-white dark:bg-gray-800"
+             data-type="custom" data-id="{{ t.id }}">
+            <p class="font-medium">{{ t.display_name }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ t.description or '3-email sequence' }}</p>
+            {% if t.is_override %}
+            <span class="inline-block mt-1 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400 text-xs rounded">Override</span>
+            {% else %}
+            <span class="inline-block mt-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-brand text-xs rounded">Custom</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Editor Panel -->
+    <div class="lg:col-span-2">
+        <div id="editor-placeholder" class="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-12 text-center text-gray-400">
+            Select a template to view or edit
+        </div>
+
+        <div id="editor-panel" class="hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h3 id="editor-title" class="text-xl font-bold"></h3>
+                <div class="flex gap-2">
+                    <button onclick="saveAsCustom()" class="px-3 py-1.5 bg-brand text-white rounded-lg text-sm">
+                        Save as Custom
+                    </button>
+                    <button id="delete-btn" onclick="deleteTemplate()" class="hidden px-3 py-1.5 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg text-sm">
+                        Delete
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sequence tabs -->
+            <div class="flex gap-2 mb-4 border-b border-gray-200 dark:border-gray-700">
+                <button onclick="showSequence(1)" class="seq-tab px-4 py-2 text-sm font-medium border-b-2 border-transparent hover:border-gray-300" data-seq="1">Email 1</button>
+                <button onclick="showSequence(2)" class="seq-tab px-4 py-2 text-sm font-medium border-b-2 border-transparent hover:border-gray-300" data-seq="2">Email 2</button>
+                <button onclick="showSequence(3)" class="seq-tab px-4 py-2 text-sm font-medium border-b-2 border-transparent hover:border-gray-300" data-seq="3">Email 3</button>
+            </div>
+
+            <!-- Editor fields -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject</label>
+                    <input type="text" id="edit-subject"
+                           class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800"
+                           oninput="markEdited()">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Body</label>
+                    <textarea id="edit-body" rows="12"
+                              class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-mono bg-white dark:bg-gray-800"
+                              oninput="markEdited()"></textarea>
+                </div>
+                <div class="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
+                    <span>Variables:</span>
+                    <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">{business_name}</code>
+                    <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">{first_name}</code>
+                    <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">{trade}</code>
+                    <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">{city}</code>
+                    <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">{state}</code>
+                    <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">{sender_name}</code>
+                </div>
+            </div>
+
+            <!-- Preview panel -->
+            <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-medium text-sm text-gray-500 dark:text-gray-400">Live Preview</h4>
+                    <button onclick="refreshPreview()" class="text-xs text-brand hover:underline">Refresh</button>
+                </div>
+                <div id="preview-panel" class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                    <p id="preview-subject" class="font-medium text-sm mb-2"></p>
+                    <div id="preview-body" class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Template Modal -->
+<div id="new-template-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 m-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">New Custom Template</h3>
+            <button onclick="closeNewTemplateModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl">&times;</button>
+        </div>
+        <form id="new-template-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Template Name</label>
+                <input type="text" id="new-name" required
+                       class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700"
+                       placeholder="my_custom_template">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Display Name</label>
+                <input type="text" id="new-display-name" required
+                       class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700"
+                       placeholder="My Custom Template">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                <input type="text" id="new-description"
+                       class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700"
+                       placeholder="Brief description of this template">
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 font-medium">Create</button>
+                <button type="button" onclick="closeNewTemplateModal()" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 font-medium">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentTemplate = null;
+let currentSequence = 1;
+let currentType = null;
+let editedSequences = {};
+let systemTemplates = {{ system_templates | tojson }};
+let customTemplates = {{ custom_templates | tojson }};
+
+function selectTemplate(type, identifier) {
+    currentType = type;
+    editedSequences = {};
+
+    // Remove active state from all cards
+    document.querySelectorAll('.template-card').forEach(c => c.classList.remove('border-brand', 'border-2'));
+
+    if (type === 'system') {
+        currentTemplate = systemTemplates.find(t => t.name === identifier);
+        document.querySelector(`.template-card[data-name="${identifier}"]`).classList.add('border-brand', 'border-2');
+        document.getElementById('delete-btn').classList.add('hidden');
+    } else {
+        currentTemplate = customTemplates.find(t => t.id === identifier);
+        document.querySelector(`.template-card[data-id="${identifier}"]`).classList.add('border-brand', 'border-2');
+        document.getElementById('delete-btn').classList.remove('hidden');
+    }
+
+    if (!currentTemplate) return;
+
+    // Copy sequences for editing
+    currentTemplate.sequences.forEach(seq => {
+        editedSequences[seq.sequence_num] = { subject: seq.subject, body: seq.body };
+    });
+
+    document.getElementById('editor-placeholder').classList.add('hidden');
+    document.getElementById('editor-panel').classList.remove('hidden');
+    document.getElementById('editor-title').textContent = currentTemplate.display_name;
+
+    showSequence(1);
+}
+
+function showSequence(num) {
+    currentSequence = num;
+
+    // Update tab styling
+    document.querySelectorAll('.seq-tab').forEach(tab => {
+        tab.classList.remove('border-brand', 'text-brand');
+        if (parseInt(tab.dataset.seq) === num) {
+            tab.classList.add('border-brand', 'text-brand');
+        }
+    });
+
+    // Populate fields
+    const seq = editedSequences[num] || { subject: '', body: '' };
+    document.getElementById('edit-subject').value = seq.subject;
+    document.getElementById('edit-body').value = seq.body;
+
+    refreshPreview();
+}
+
+function markEdited() {
+    editedSequences[currentSequence] = {
+        subject: document.getElementById('edit-subject').value,
+        body: document.getElementById('edit-body').value
+    };
+}
+
+async function refreshPreview() {
+    const subject = document.getElementById('edit-subject').value;
+    const body = document.getElementById('edit-body').value;
+
+    const res = await fetch('/api/templates/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, body })
+    });
+
+    if (res.ok) {
+        const data = await res.json();
+        document.getElementById('preview-subject').textContent = 'Subject: ' + data.subject;
+        document.getElementById('preview-body').textContent = data.body;
+    }
+}
+
+async function saveAsCustom() {
+    const name = prompt('Enter template name (lowercase, underscores):', currentTemplate?.name || 'my_template');
+    if (!name) return;
+
+    const displayName = prompt('Enter display name:', currentTemplate?.display_name || 'My Template');
+    if (!displayName) return;
+
+    const sequences = [1, 2, 3].map(num => ({
+        sequence_num: num,
+        subject: editedSequences[num]?.subject || '',
+        body: editedSequences[num]?.body || ''
+    }));
+
+    const isOverride = systemTemplates.some(t => t.name === name);
+
+    const res = await fetch('/api/templates/custom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name: name.toLowerCase().replace(/\s+/g, '_'),
+            display_name: displayName,
+            description: '',
+            sequences: sequences,
+            is_override: isOverride
+        })
+    });
+
+    if (res.ok) {
+        showToast('Template saved!', 'success');
+        setTimeout(() => location.reload(), 800);
+    } else {
+        const err = await res.json();
+        showToast(err.error || 'Failed to save', 'error');
+    }
+}
+
+async function deleteTemplate() {
+    if (!currentTemplate || currentType !== 'custom') return;
+    if (!confirm('Delete this custom template?')) return;
+
+    const res = await fetch(`/api/templates/custom/${currentTemplate.id}`, { method: 'DELETE' });
+    if (res.ok) {
+        showToast('Template deleted', 'success');
+        setTimeout(() => location.reload(), 500);
+    }
+}
+
+function openNewTemplateModal() {
+    document.getElementById('new-template-modal').classList.remove('hidden');
+    document.getElementById('new-template-modal').classList.add('flex');
+    document.getElementById('new-name').focus();
+}
+
+function closeNewTemplateModal() {
+    document.getElementById('new-template-modal').classList.add('hidden');
+    document.getElementById('new-template-modal').classList.remove('flex');
+}
+
+document.getElementById('new-template-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('new-name').value.toLowerCase().replace(/\s+/g, '_');
+    const displayName = document.getElementById('new-display-name').value;
+    const description = document.getElementById('new-description').value;
+
+    const sequences = [1, 2, 3].map(num => ({
+        sequence_num: num,
+        subject: `Email ${num} subject for {business_name}`,
+        body: `Hi {first_name},\n\nThis is email ${num} of your sequence.\n\nBest,\n{sender_name}`
+    }));
+
+    const res = await fetch('/api/templates/custom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, display_name: displayName, description, sequences, is_override: false })
+    });
+
+    if (res.ok) {
+        showToast('Template created!', 'success');
+        setTimeout(() => location.reload(), 500);
+    } else {
+        const err = await res.json();
+        showToast(err.error || 'Failed to create', 'error');
+    }
+});
+
+// Debounced preview refresh
+let previewTimeout;
+['edit-subject', 'edit-body'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', () => {
+        clearTimeout(previewTimeout);
+        previewTimeout = setTimeout(refreshPreview, 500);
+    });
+});
+
+// Close modal on escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeNewTemplateModal();
+});
+</script>
+{% endblock %}

@@ -21,6 +21,8 @@ from backend.database import (
     insert_leads_bulk, get_email_queue, get_sent_emails, update_email,
     get_stats, get_setting, set_setting, get_emails_for_lead,
     get_today_send_count, get_all_leads_for_export, get_followup_candidates,
+    get_custom_templates, get_custom_template, save_custom_template,
+    delete_custom_template, get_leads_by_state,
 )
 from backend.email_generator import (
     generate_and_save_emails, get_template_names, preview_template,
@@ -107,6 +109,43 @@ def settings_page():
     return render_template('settings.html',
                            gmail_connected=gmail_connected,
                            sheets_connected=sheets_connected)
+
+
+@app.route('/templates')
+def templates_page():
+    """Template editor page."""
+    from backend.email_generator import TEMPLATES
+    # Get system templates (hardcoded)
+    system_templates = []
+    for name in get_template_names():
+        template_data = TEMPLATES.get(name, {})
+        system_templates.append({
+            'name': name,
+            'display_name': name.replace('_', ' ').title(),
+            'is_system': True,
+            'sequences': [
+                {'sequence_num': i, 'subject': template_data.get(i, {}).get('subject', ''),
+                 'body': template_data.get(i, {}).get('body', '')}
+                for i in (1, 2, 3)
+            ]
+        })
+    # Get custom templates (from DB)
+    custom_templates = get_custom_templates()
+    return render_template('templates.html',
+                           system_templates=system_templates,
+                           custom_templates=custom_templates)
+
+
+@app.route('/map')
+def map_page():
+    """Lead distribution map page."""
+    from backend.database import get_db
+    conn = get_db()
+    trades = [r[0] for r in conn.execute(
+        "SELECT DISTINCT trade FROM leads WHERE trade != '' AND trade IS NOT NULL ORDER BY trade"
+    ).fetchall()]
+    conn.close()
+    return render_template('map.html', trades=trades)
 
 
 # --- API: Scraping ---
@@ -409,6 +448,111 @@ def api_save_settings():
 @app.route('/api/stats', methods=['GET'])
 def api_get_stats():
     return jsonify(get_stats())
+
+
+# --- API: Templates ---
+
+@app.route('/api/templates/all', methods=['GET'])
+def api_get_all_templates():
+    """Get all templates (system + custom)."""
+    from backend.email_generator import TEMPLATES
+    system = []
+    for name in get_template_names():
+        template_data = TEMPLATES.get(name, {})
+        system.append({
+            'name': name,
+            'display_name': name.replace('_', ' ').title(),
+            'is_system': True,
+            'sequences': [
+                {'sequence_num': i, 'subject': template_data.get(i, {}).get('subject', ''),
+                 'body': template_data.get(i, {}).get('body', '')}
+                for i in (1, 2, 3)
+            ]
+        })
+    custom = get_custom_templates()
+    return jsonify({'system': system, 'custom': custom})
+
+
+@app.route('/api/templates/custom', methods=['POST'])
+def api_create_template():
+    """Create or update a custom template."""
+    data = request.json
+    name = data.get('name', '').strip().lower().replace(' ', '_')
+    display_name = data.get('display_name', '').strip()
+    description = data.get('description', '')
+    sequences = data.get('sequences', [])
+    is_override = data.get('is_override', False)
+
+    if not name or not display_name:
+        return jsonify({'error': 'Name and display name are required'}), 400
+
+    if len(sequences) != 3:
+        return jsonify({'error': 'Must provide exactly 3 sequences'}), 400
+
+    template_id = save_custom_template(name, display_name, description, sequences, is_override)
+    return jsonify({'success': True, 'id': template_id})
+
+
+@app.route('/api/templates/custom/<int:template_id>', methods=['GET'])
+def api_get_custom_template(template_id):
+    """Get a single custom template."""
+    template = get_custom_template(template_id)
+    if not template:
+        return jsonify({'error': 'Template not found'}), 404
+    return jsonify(template)
+
+
+@app.route('/api/templates/custom/<int:template_id>', methods=['DELETE'])
+def api_delete_custom_template(template_id):
+    """Delete a custom template."""
+    delete_custom_template(template_id)
+    return jsonify({'success': True})
+
+
+@app.route('/api/templates/preview', methods=['POST'])
+def api_preview_template_custom():
+    """Preview a template with sample data."""
+    data = request.json
+    subject = data.get('subject', '')
+    body = data.get('body', '')
+
+    # Sample lead data for preview
+    sample = {
+        'business_name': 'ABC Plumbing',
+        'contact_name': 'John Smith',
+        'trade': 'plumber',
+        'city': 'Austin',
+        'state': 'TX',
+    }
+
+    sender_name = get_setting('sender_name', 'Your Name')
+    sender_title = get_setting('sender_title', '')
+
+    replacements = {
+        '{business_name}': sample['business_name'],
+        '{first_name}': 'John',
+        '{trade}': sample['trade'],
+        '{city}': sample['city'],
+        '{state}': sample['state'],
+        '{sender_name}': sender_name,
+        '{sender_title}': sender_title,
+    }
+
+    for key, val in replacements.items():
+        subject = subject.replace(key, val)
+        body = body.replace(key, val)
+
+    return jsonify({'subject': subject, 'body': body})
+
+
+# --- API: Map Data ---
+
+@app.route('/api/leads/map-data', methods=['GET'])
+def api_map_data():
+    """Return confidence scores aggregated by state."""
+    trade = request.args.get('trade', '')
+    data = get_leads_by_state(trade_filter=trade)
+    return jsonify(data)
 
 
 # --- Init ---
